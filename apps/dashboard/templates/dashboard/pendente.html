@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-warning text-dark">
+            <h2 class="card-title">{{ titulo }}</h2>
+            <p class="mb-0">{{ subtitulo }}</p>
+        </div>
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <img src="{% static 'img/pending.svg' %}" alt="Pendente" class="img-fluid mb-3" style="max-width: 150px;">
+                <h3>Seu cadastro está em análise</h3>
+                <p class="lead">
+                    Sua conta foi criada com sucesso, mas precisa ser aprovada por um administrador.
+                </p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">O que acontece agora?</h4>
+                        </div>
+                        <div class="card-body">
+                            <ol class="ps-3">
+                                <li class="mb-2">Seu cadastro foi recebido e está na fila de aprovação</li>
+                                <li class="mb-2">Um administrador irá revisar suas informações</li>
+                                <li class="mb-2">Após aprovação, você receberá um email de confirmação</li>
+                                <li class="mb-2">Então você terá acesso completo à plataforma</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-info text-white">
+                            <h4 class="mb-0">Enquanto isso...</h4>
+                        </div>
+                        <div class="card-body">
+                            <p>Você pode:</p>
+                            <ul class="ps-3">
+                                <li class="mb-2">Verificar e completar seu perfil</li>
+                                <li class="mb-2">Conhecer mais sobre nossos planos</li>
+                                <li class="mb-2">Entrar em contato se tiver dúvidas</li>
+                            </ul>
+                            <div class="mt-3">
+                                <a href="{% url 'perfil_usuario' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-user me-2"></i> Meu Perfil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle me-3 fs-3"></i>
+                    <div>
+                        <h5 class="mb-1">Tempo de aprovação</h5>
+                        <p class="mb-0">Normalmente aprovamos novos usuários em até 24 horas úteis. Agradecemos sua paciência.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <a href="{% url 'logout' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-sign-out-alt me-2"></i> Fazer Logout
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Acesso Pendente - Gerencial SaaS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark text-center py-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-clock"></i> Acesso Pendente
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="display-1 text-warning mb-3">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <h5>Olá, {{ user.get_full_name }}!</h5>
+                        <p class="text-muted">
+                            Sua conta foi criada com sucesso, mas ainda está pendente de aprovação.
+                        </p>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-info-circle"></i> O que acontece agora?
+                        </h6>
+                        <ul class="mb-0 mt-2">
+                            <li>Nossa equipe irá analisar seu cadastro</li>
+                            <li>Você receberá um e-mail quando sua conta for aprovada</li>
+                            <li>Após a aprovação, você terá acesso ao dashboard completo</li>
+                        </ul>
+                    </div>
+
+                    <div class="border rounded p-3 mb-4">
+                        <h6 class="mb-3">Enquanto isso, você pode:</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-grid">
+                                    <a href="{% url 'perfil_usuario' %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-user-edit"></i> Completar seu Perfil
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-grid">
+                                    <a href="{% url 'contato' %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-envelope"></i> Entrar em Contato
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="mb-0">
+                            <small class="text-muted">
+                                Dúvidas? Entre em contato com nosso suporte através do e-mail 
+                                <a href="mailto:suporte@gerencialsaas.com">suporte@gerencialsaas.com</a>
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

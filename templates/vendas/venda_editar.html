@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - Gerencial SaaS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'cliente_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'venda_lista' %}">Vendas</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ titulo }}</li>
+        </ol>
+    </nav>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-0 text-primary">{{ titulo }}</h1>
+            <p class="text-muted">{{ subtitulo }}</p>
+        </div>
+        <div>
+            <a href="{% url 'venda_lista' %}" class="btn btn-outline-dark">
+                <i class="fas fa-arrow-left me-2"></i>Voltar
+            </a>
+        </div>
+    </div>
+    
+    <!-- Resumo da Venda -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Informações da Venda</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Cliente:</span>
+                            <strong>
+                                {% if venda.cliente_cadastrado %}
+                                    {{ venda.cliente_cadastrado.nome }}
+                                {% else %}
+                                    {{ venda.cliente_nome }}
+                                {% endif %}
+                            </strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Forma de Pagamento:</span>
+                            <strong>{{ venda.forma_pagamento.nome }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Método de Envio:</span>
+                            <strong>{{ venda.metodo_envio.nome }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Data da Venda:</span>
+                            <strong>{{ venda.data_venda|date:"d/m/Y H:i" }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Status:</span>
+                            <span class="badge bg-{{ venda.status|default:'rascunho'|yesno:'success,warning' }} rounded-pill">
+                                {{ venda.get_status_display }}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Resumo Financeiro</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Subtotal:</span>
+                            <strong>R$ {{ venda.subtotal|floatformat:2 }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Desconto ({{ venda.desconto_percentual }}%):</span>
+                            <strong class="text-danger">- R$ {{ venda.desconto_valor|floatformat:2 }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Frete:</span>
+                            <strong>R$ {{ venda.valor_frete|floatformat:2 }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
+                            <span class="fw-bold">Total:</span>
+                            <strong class="text-success fs-5">R$ {{ venda.valor_total|floatformat:2 }}</strong>
+                        </li>
+                    </ul>
+                    
+                    <!-- Aplicar Desconto -->
+                    <div class="mt-3">
+                        <form method="post" class="row g-3">
+                            {% csrf_token %}
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" name="desconto_percentual" 
+                                           placeholder="% Desconto" min="0" max="100" step="0.01"
+                                           value="{{ venda.desconto_percentual }}">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-outline-primary w-100" name="aplicar_desconto">
+                                    <i class="fas fa-percentage me-2"></i>Aplicar Desconto
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Produtos Adicionados -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">Produtos da Venda</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Produto</th>
+                            <th class="text-center">Quantidade</th>
+                            <th class="text-end">Valor Unitário</th>
+                            <th class="text-end">Valor Total</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if itens %}
+                            {% for item in itens %}
+                                <tr>
+                                    <td>{{ item.produto.nome }}</td>
+                                    <td class="text-center">{{ item.quantidade }}</td>
+                                    <td class="text-end">R$ {{ item.valor_unitario|floatformat:2 }}</td>
+                                    <td class="text-end">R$ {{ item.valor_total|floatformat:2 }}</td>
+                                    <td class="text-center">
+                                        <a href="{% url 'venda_item_remover' venda.id item.id %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-3">
+                                    <div class="alert alert-warning mb-0">
+                                        Nenhum produto adicionado à venda. Adicione produtos abaixo.
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Adicionar Produtos -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0">Adicionar Produtos</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                <div class="col-md-6">
+                    <label for="produto_id" class="form-label">Produto</label>
+                    <select class="form-select" id="produto_id" name="produto_id" required>
+                        <option value="">Selecione um produto</option>
+                        {% for produto in produtos %}
+                            <option value="{{ produto.id }}" data-preco="{{ produto.preco }}" data-estoque="{{ produto.estoque }}">
+                                {{ produto.nome }} (Estoque: {{ produto.estoque }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="quantidade" class="form-label">Quantidade</label>
+                    <input type="number" class="form-control" id="quantidade" name="quantidade" min="1" value="1" required>
+                    <div id="estoqueDisponivel" class="form-text text-muted"></div>
+                </div>
+                <div class="col-md-3">
+                    <label for="valorUnitario" class="form-label">Valor Unitário</label>
+                    <div class="input-group">
+                        <span class="input-group-text">R$</span>
+                        <input type="text" class="form-control" id="valorUnitario" disabled>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-success" name="adicionar_item">
+                        <i class="fas fa-plus-circle me-2"></i>Adicionar Produto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Botões de Ação -->
+    <div class="text-end mb-4">
+        <form method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" name="finalizar_venda" class="btn btn-primary btn-lg">
+                <i class="fas fa-check-circle me-2"></i>Finalizar Venda
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const produtoSelect = document.getElementById('produto_id');
+        const quantidadeInput = document.getElementById('quantidade');
+        const valorUnitarioInput = document.getElementById('valorUnitario');
+        const estoqueDisponivel = document.getElementById('estoqueDisponivel');
+        
+        function atualizarProdutoInfo() {
+            if (produtoSelect.selectedIndex > 0) {
+                const option = produtoSelect.options[produtoSelect.selectedIndex];
+                const preco = option.dataset.preco;
+                const estoque = option.dataset.estoque;
+                
+                valorUnitarioInput.value = parseFloat(preco).toFixed(2).replace('.', ',');
+                estoqueDisponivel.innerHTML = `Disponível: ${estoque} unidade(s)`;
+                
+                // Limitar quantidade ao estoque disponível
+                quantidadeInput.max = estoque;
+                if (parseInt(quantidadeInput.value) > parseInt(estoque)) {
+                    quantidadeInput.value = estoque;
+                }
+            } else {
+                valorUnitarioInput.value = '';
+                estoqueDisponivel.innerHTML = '';
+            }
+        }
+        
+        produtoSelect.addEventListener('change', atualizarProdutoInfo);
+        atualizarProdutoInfo();
+    });
+</script>
+{% endblock %} 

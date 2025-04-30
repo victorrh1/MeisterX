@@ -1,0 +1,35 @@
+{% comment %}
+Componente para renderizar cards dinâmicos baseados nos grupos do usuário
+Este arquivo deve ser incluído nos dashboards específicos usando {% include 'partials/cards_dinamicos.html' %}
+{% endcomment %}
+{% load core_extras %}
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+    {% for card in dashboard_cards %}
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm card-dashboard">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="icon-circle bg-{{ card.color }} bg-opacity-10 text-{{ card.color }} me-3">
+                        <i class="fas {{ card.icon }}"></i>
+                    </div>
+                    <h5 class="card-title mb-0 text-{{ card.color }}">{{ card.title }}</h5>
+                </div>
+                
+                {% if card.count %}
+                    {% with counter_value=view_context|get_item:card.count %}
+                        {% if counter_value %}
+                            <h2 class="display-6 fw-bold mb-0">{{ counter_value }}</h2>
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
+                
+                <p class="text-muted mt-2">{{ card.description }}</p>
+            </div>
+            <div class="card-footer bg-transparent border-top">
+                <a href="{{ card.url }}" class="text-decoration-none text-{{ card.color }}" id="card-{{ card.id }}-link" data-url="{{ card.url }}">Acessar</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div> 

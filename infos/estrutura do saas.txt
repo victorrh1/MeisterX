@@ -1,0 +1,11 @@
+C:\Users\Admin\OneDrive\Área de Trabalho\gerencial_saas
+
+Dentro desse diretorio tem:
+
+apps >> core: __pycache__, migrations, __ini__.py, admin.py, apps.py, models.py, tests.py, views.py 
+gerencial_saas >> __pycache__, __init__.py, asgi.py, settings.py, urls.py, wsgi.py
+venv >> Include, Lib, Scripts, .gitignore.txt, pyvenv.cfg
+manage.py
+
+
+Os sinais de maior >>, será para referir que está dentro da pasta

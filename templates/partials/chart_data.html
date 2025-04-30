@@ -1,0 +1,13 @@
+{% comment %}
+Template parcial para definir os dados dos gráficos
+Isso separa os dados do template Django da lógica JavaScript
+{% endcomment %}
+
+<script>
+  // Atribui os dados do gráfico a variáveis globais
+  window.dashboardCharts = window.dashboardCharts || {};
+  window.dashboardCharts.vendas = {
+    labels: {{ labels|safe }},
+    data: {{ data|safe }}
+  };
+</script> 

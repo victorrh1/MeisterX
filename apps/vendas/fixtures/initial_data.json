@@ -1,0 +1,59 @@
+[
+  {
+    "model": "vendas.formapagamento",
+    "pk": 1,
+    "fields": {
+      "nome": "Cartão de Crédito",
+      "descricao": "Pagamento via cartão de crédito",
+      "ativo": true
+    }
+  },
+  {
+    "model": "vendas.formapagamento",
+    "pk": 2,
+    "fields": {
+      "nome": "Pix",
+      "descricao": "Pagamento via Pix",
+      "ativo": true
+    }
+  },
+  {
+    "model": "vendas.formapagamento",
+    "pk": 3,
+    "fields": {
+      "nome": "Boleto Bancário",
+      "descricao": "Pagamento via boleto bancário",
+      "ativo": true
+    }
+  },
+  {
+    "model": "vendas.metodoenvio",
+    "pk": 1,
+    "fields": {
+      "nome": "Correios - PAC",
+      "descricao": "Entrega via Correios - PAC",
+      "taxa_fixa": 15.00,
+      "ativo": true
+    }
+  },
+  {
+    "model": "vendas.metodoenvio",
+    "pk": 2,
+    "fields": {
+      "nome": "Correios - SEDEX",
+      "descricao": "Entrega via Correios - SEDEX",
+      "taxa_fixa": 25.00,
+      "ativo": true
+    }
+  },
+  {
+    "model": "vendas.metodoenvio",
+    "pk": 3,
+    "fields": {
+      "nome": "Entrega Expressa",
+      "descricao": "Entrega expressa em até 24h",
+      "taxa_fixa": 35.00,
+      "ativo": true
+    }
+  }
+] 

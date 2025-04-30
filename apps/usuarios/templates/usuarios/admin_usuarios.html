@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>{{ titulo }}</h1>
+            <p class="lead">{{ subtitulo }}</p>
+        </div>
+    </div>
+
+    <!-- Usuários Pendentes -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">
+                <i class="fas fa-user-clock me-2"></i> Usuários Pendentes de Aprovação
+            </h3>
+            <span class="badge bg-dark">{{ usuarios_pendentes|length }}</span>
+        </div>
+        <div class="card-body">
+            {% if usuarios_pendentes %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Usuário</th>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Data de Registro</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for perfil in usuarios_pendentes %}
+                        <tr>
+                            <td>{{ perfil.user.username }}</td>
+                            <td>{{ perfil.user.get_full_name|default:"-" }}</td>
+                            <td>{{ perfil.user.email }}</td>
+                            <td>{{ perfil.registration_date|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'aprovar_usuario' perfil.user.id %}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-check-circle"></i> Aprovar
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> Não há usuários pendentes de aprovação.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Usuários Aprovados -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">
+                <i class="fas fa-users me-2"></i> Usuários Aprovados
+            </h3>
+            <span class="badge bg-light text-dark">{{ usuarios_aprovados|length }}</span>
+        </div>
+        <div class="card-body">
+            {% if usuarios_aprovados %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Usuário</th>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Data de Aprovação</th>
+                            <th>Grupos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for perfil in usuarios_aprovados %}
+                        <tr>
+                            <td>{{ perfil.user.username }}</td>
+                            <td>{{ perfil.user.get_full_name|default:"-" }}</td>
+                            <td>{{ perfil.user.email }}</td>
+                            <td>{{ perfil.approval_date|date:"d/m/Y H:i"|default:"-" }}</td>
+                            <td>
+                                {% for group in perfil.user.groups.all %}
+                                <span class="badge bg-primary">{{ group.name }}</span>
+                                {% empty %}
+                                <span class="badge bg-secondary">Sem grupo</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> Não há usuários aprovados.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

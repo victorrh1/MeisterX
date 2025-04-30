@@ -1,0 +1,511 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cadastro de Cliente{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'cliente_empresa_lista' %}">Clientes</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{% if form.instance.id %}Editar{% else %}Cadastrar{% endif %} Cliente</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">{% if form.instance.id %}Editar{% else %}Cadastrar{% endif %} Cliente</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate id="clienteForm" data-no-spinner="true">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <h5 class="mb-3 border-bottom pb-2">Informações Básicas</h5>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.nome.id_for_label }}">Nome *</label>
+                            {{ form.nome }}
+                            {% if form.nome.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.nome.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.email.id_for_label }}">Email *</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.email.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.telefone.id_for_label }}">Telefone Principal *</label>
+                            {{ form.telefone }}
+                            {% if form.telefone.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.telefone.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.telefone_secundario.id_for_label }}">Telefone Secundário</label>
+                            {{ form.telefone_secundario }}
+                            {% if form.telefone_secundario.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.telefone_secundario.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.empresa.id_for_label }}">Empresa</label>
+                            {{ form.empresa }}
+                            {% if form.empresa.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.empresa.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Campos de compatibilidade ocultos -->
+                {{ form.endereco_principal }}
+                {{ form.endereco_cidade }}
+                {{ form.endereco_estado }}
+                {{ form.endereco_cep }}
+                {{ form.endereco_secundario }}
+                {{ form.endereco_adicional }}
+                
+                <div class="d-flex justify-content-between align-items-center mb-3 mt-4 border-bottom pb-2">
+                    <h5 class="mb-0">Endereço</h5>
+                </div>
+                
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="fas fa-info-circle me-2"></i> O endereço principal será usado como padrão em vendas.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <!-- Endereços dinâmicos -->
+                <div id="enderecos-container">
+                    {{ endereco_formset.management_form }}
+                    
+                    {% for endereco_form in endereco_formset %}
+                    {% if forloop.first %}
+                    <div class="endereco-form card mb-4">
+                        <div class="card-header bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">
+                                    Endereço Principal
+                                    <span class="badge bg-primary ms-2">Principal</span>
+                                </h6>
+                                
+                                <!-- Botões de ação -->
+                                <div>
+                                    {% if endereco_form.instance.id %}
+                                    <a href="{% url 'editar_endereco' endereco_id=endereco_form.instance.id %}" class="btn btn-sm btn-info" title="Editar Endereço">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {{ endereco_form.id }}
+                            {% if endereco_form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ endereco_form.non_field_errors }}
+                            </div>
+                            {% endif %}
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="{{ endereco_form.tipo.id_for_label }}">Tipo de Endereço *</label>
+                                        {{ endereco_form.tipo }}
+                                        {% if forloop.first %}
+                                        <script>
+                                            document.addEventListener('DOMContentLoaded', function() {
+                                                const select = document.getElementById('{{ endereco_form.tipo.id_for_label }}');
+                                                if (select) {
+                                                    select.value = 'principal';
+                                                    select.disabled = true;
+                                                }
+                                            });
+                                        </script>
+                                        {% endif %}
+                                        {% if endereco_form.tipo.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ endereco_form.tipo.errors }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="{{ endereco_form.nome.id_for_label }}">Nome do Endereço</label>
+                                        {{ endereco_form.nome }}
+                                        {% if endereco_form.nome.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ endereco_form.nome.errors }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-8">
+                                    <div class="form-group mb-3">
+                                        <label for="{{ endereco_form.logradouro.id_for_label }}">Logradouro *</label>
+                                        {{ endereco_form.logradouro }}
+                                        {% if endereco_form.logradouro.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ endereco_form.logradouro.errors }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="{{ endereco_form.numero.id_for_label }}">Número *</label>
+                                        {{ endereco_form.numero }}
+                                        {% if endereco_form.numero.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ endereco_form.numero.errors }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="{{ endereco_form.complemento.id_for_label }}">Complemento</label>
+                                        {{ endereco_form.complemento }}
+                                        {% if endereco_form.complemento.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ endereco_form.complemento.errors }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="{{ endereco_form.bairro.id_for_label }}">Bairro *</label>
+                                        {{ endereco_form.bairro }}
+                                        {% if endereco_form.bairro.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ endereco_form.bairro.errors }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-5">
+                                    <div class="form-group mb-3">
+                                        <label for="{{ endereco_form.cidade.id_for_label }}">Cidade *</label>
+                                        {{ endereco_form.cidade }}
+                                        {% if endereco_form.cidade.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ endereco_form.cidade.errors }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group mb-3">
+                                        <label for="{{ endereco_form.estado.id_for_label }}">Estado *</label>
+                                        {{ endereco_form.estado }}
+                                        {% if endereco_form.estado.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ endereco_form.estado.errors }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="{{ endereco_form.cep.id_for_label }}">CEP *</label>
+                                        {{ endereco_form.cep }}
+                                        {% if endereco_form.cep.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ endereco_form.cep.errors }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Campo para marcar exclusão quando usando formset com can_delete=True -->
+                            {% if endereco_form.DELETE %}
+                            <div class="d-none">
+                                {{ endereco_form.DELETE }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                
+                <h5 class="mt-4 mb-3 border-bottom pb-2">Informações Adicionais</h5>
+                <div class="form-group mb-3">
+                    <label for="{{ form.observacoes.id_for_label }}">Observações</label>
+                    {{ form.observacoes }}
+                    {% if form.observacoes.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.observacoes.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>{{ botao }}
+                    </button>
+                    <a href="{% url 'cliente_empresa_lista' %}" class="btn btn-secondary" data-no-spinner="true">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<!-- Adicionar jQuery explicitamente -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+// Script super simplificado - abordagem "à prova de falhas"
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Inicializando manipuladores de endereços com JavaScript nativo");
+    
+    // Configurar tipos de endereço
+    const tipoSelects = document.querySelectorAll('select[name$="-tipo"]');
+    for (let i = 0; i < tipoSelects.length; i++) {
+        if (i === 0) {
+            // Primeiro endereço sempre é principal
+            tipoSelects[i].value = 'principal';
+            tipoSelects[i].disabled = true;
+        } else {
+            // Outros endereços não podem ser principal
+            const options = tipoSelects[i].querySelectorAll('option');
+            for (let j = 0; j < options.length; j++) {
+                if (options[j].value === 'principal') {
+                    options[j].disabled = true;
+                }
+            }
+            
+            // Se o valor atual for principal, mudar para outro valor
+            if (tipoSelects[i].value === 'principal') {
+                tipoSelects[i].value = 'comercial';
+            }
+        }
+    }
+    
+    // Aplicar máscara de CEP
+    const cepInputs = document.querySelectorAll('input[name$="-cep"]');
+    for (let i = 0; i < cepInputs.length; i++) {
+        cepInputs[i].addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 5) {
+                value = value.substring(0, 5) + '-' + value.substring(5, 8);
+            }
+            this.value = value;
+        });
+    }
+});
+</script>
+
+<!-- Abordagem alternativa com jQuery -->
+<script>
+jQuery(function($) {
+    console.log("Inicializando manipuladores com jQuery como fallback");
+    
+    // Configurar tipos de endereço com jQuery
+    $('select[name$="-tipo"]').each(function(index) {
+        if (index === 0) {
+            // Primeiro endereço sempre é principal
+            $(this).val('principal').prop('disabled', true);
+        } else {
+            // Outros endereços não podem ser principal
+            $(this).find('option[value="principal"]').prop('disabled', true);
+            
+            // Se o valor atual for principal, mudar para outro valor
+            if ($(this).val() === 'principal') {
+                $(this).val('comercial');
+            }
+        }
+    });
+    
+    // Formatar CEP para endereços existentes
+    $("input[name$='-cep']").on("input", function() {
+        let value = $(this).val().replace(/\D/g, '');
+        if (value.length > 5) {
+            value = value.substring(0, 5) + '-' + value.substring(5, 8);
+        }
+        $(this).val(value);
+    });
+});
+</script>
+
+<!-- Adicionar template de endereço vazio para JavaScript -->
+<template id="endereco-vazio-template">
+    <div class="endereco-form card mb-4">
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                    Endereço #<span class="endereco-numero">__prefix__</span>
+                </h6>
+                
+                <!-- Botões de ação -->
+                <div>
+                    <a href="#" class="btn btn-sm btn-danger btn-remover-endereco" title="Remover Endereço">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <input type="hidden" name="endereco-__prefix__-id" id="id_endereco-__prefix__-id">
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="id_endereco-__prefix__-tipo">Tipo de Endereço *</label>
+                        <select name="endereco-__prefix__-tipo" class="form-select" id="id_endereco-__prefix__-tipo" required>
+                            <option value="">---------</option>
+                            <option value="principal" disabled>Principal</option>
+                            <option value="comercial" selected>Comercial</option>
+                            <option value="entrega">Entrega</option>
+                            <option value="cobranca">Cobrança</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="id_endereco-__prefix__-nome">Nome do Endereço</label>
+                        <input type="text" name="endereco-__prefix__-nome" class="form-control" id="id_endereco-__prefix__-nome">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-8">
+                    <div class="form-group mb-3">
+                        <label for="id_endereco-__prefix__-logradouro">Logradouro *</label>
+                        <input type="text" name="endereco-__prefix__-logradouro" class="form-control" id="id_endereco-__prefix__-logradouro" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label for="id_endereco-__prefix__-numero">Número *</label>
+                        <input type="text" name="endereco-__prefix__-numero" class="form-control" id="id_endereco-__prefix__-numero" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="id_endereco-__prefix__-complemento">Complemento</label>
+                        <input type="text" name="endereco-__prefix__-complemento" class="form-control" id="id_endereco-__prefix__-complemento">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="id_endereco-__prefix__-bairro">Bairro *</label>
+                        <input type="text" name="endereco-__prefix__-bairro" class="form-control" id="id_endereco-__prefix__-bairro" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-5">
+                    <div class="form-group mb-3">
+                        <label for="id_endereco-__prefix__-cidade">Cidade *</label>
+                        <input type="text" name="endereco-__prefix__-cidade" class="form-control" id="id_endereco-__prefix__-cidade" required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group mb-3">
+                        <label for="id_endereco-__prefix__-estado">Estado *</label>
+                        <select name="endereco-__prefix__-estado" class="form-select" id="id_endereco-__prefix__-estado" required>
+                            <option value="">---------</option>
+                            <option value="AC">AC</option>
+                            <option value="AL">AL</option>
+                            <option value="AP">AP</option>
+                            <option value="AM">AM</option>
+                            <option value="BA">BA</option>
+                            <option value="CE">CE</option>
+                            <option value="DF">DF</option>
+                            <option value="ES">ES</option>
+                            <option value="GO">GO</option>
+                            <option value="MA">MA</option>
+                            <option value="MT">MT</option>
+                            <option value="MS">MS</option>
+                            <option value="MG">MG</option>
+                            <option value="PA">PA</option>
+                            <option value="PB">PB</option>
+                            <option value="PR">PR</option>
+                            <option value="PE">PE</option>
+                            <option value="PI">PI</option>
+                            <option value="RJ">RJ</option>
+                            <option value="RN">RN</option>
+                            <option value="RS">RS</option>
+                            <option value="RO">RO</option>
+                            <option value="RR">RR</option>
+                            <option value="SC">SC</option>
+                            <option value="SP">SP</option>
+                            <option value="SE">SE</option>
+                            <option value="TO">TO</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label for="id_endereco-__prefix__-cep">CEP *</label>
+                        <input type="text" name="endereco-__prefix__-cep" class="form-control" id="id_endereco-__prefix__-cep" required>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Campo para marcar exclusão quando usando formset com can_delete=True -->
+            <div class="d-none">
+                <input type="checkbox" name="endereco-__prefix__-DELETE" id="id_endereco-__prefix__-DELETE">
+            </div>
+        </div>
+    </div>
+</template>
+{% endblock %}

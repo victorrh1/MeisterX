@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Cadastrar Novo Produto{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">Cadastrar Novo Produto</h2>
+                    
+                    <form method="post" id="form-produto" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="nome" class="form-label">Nome do Produto <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nome" name="nome" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="estoque" class="form-label">Estoque <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="estoque" name="estoque" min="0" value="1" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">Descrição <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="descricao" name="descricao" rows="4" required></textarea>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="preco" class="form-label">Preço (R$) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="number" class="form-control" id="preco" name="preco" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="categoria" class="form-label">Categoria <span class="text-danger">*</span></label>
+                                <select class="form-select" id="categoria" name="categoria" required>
+                                    <option value="">Selecione...</option>
+                                    {% for categoria in categorias %}
+                                    <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="tipo" class="form-label">Tipo de Produto <span class="text-danger">*</span></label>
+                                <select class="form-select" id="tipo" name="tipo" required>
+                                    <option value="assinatura">Assinatura Mensal</option>
+                                    <option value="licenca">Licença Anual</option>
+                                    <option value="servico">Serviço Único</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="duracao_dias" class="form-label">Duração (dias) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="duracao_dias" name="duracao_dias" min="1" value="30" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Recursos Adicionais</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="permite_exportacao" name="permite_exportacao">
+                                <label class="form-check-label" for="permite_exportacao">Permite Exportação</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="permite_api" name="permite_api">
+                                <label class="form-check-label" for="permite_api">Acesso API</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="suporte_24h" name="suporte_24h">
+                                <label class="form-check-label" for="suporte_24h">Suporte Premium</label>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="usuarios_permitidos" class="form-label">Usuários Permitidos</label>
+                                <input type="number" class="form-control" id="usuarios_permitidos" name="usuarios_permitidos" min="1" value="1">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="armazenamento_gb" class="form-label">Espaço de Armazenamento (GB)</label>
+                                <input type="number" class="form-control" id="armazenamento_gb" name="armazenamento_gb" min="1" value="5">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="imagem" class="form-label">Imagem do Produto</label>
+                            <input type="file" class="form-control" id="imagem" name="imagem">
+                            <div class="form-text">Imagem opcional para representar o produto</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'cliente_dashboard' %}" class="btn btn-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn btn-primary" id="btn-cadastrar">Cadastrar Produto</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Dica -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle text-primary me-3 fs-4"></i>
+                        <div>
+                            <h5 class="mb-1">Controle de Estoque</h5>
+                            <p class="mb-0 small text-muted">Ao cadastrar um produto, ele ficará disponível no seu inventário. Todos os usuários receberão uma notificação sobre o novo produto.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Adiciona validação de formulário com feedback visual
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('form-produto');
+        
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                hideSpinner(); // Esconder spinner se o formulário for inválido
+            } else {
+                showSpinner(); // Mostrar spinner ao enviar o formulário
+                
+                // Desabilitar botão para evitar duplo clique
+                document.getElementById('btn-cadastrar').disabled = true;
+            }
+            
+            form.classList.add('was-validated');
+        }, false);
+    });
+</script>
+{% endblock %} 

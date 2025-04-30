@@ -1,0 +1,187 @@
+/* Gerencial SaaS - Estilos Globais */
+
+/* Estilos para o ribbon (etiqueta "Mais Popular") */
+.ribbon {
+  position: absolute;
+  right: -5px;
+  top: -5px;
+  z-index: 1;
+  overflow: hidden;
+  width: 120px;
+  height: 120px;
+  text-align: right;
+}
+
+.ribbon span {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #FFF;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 25px;
+  transform: rotate(45deg);
+  width: 150px;
+  display: block;
+  background: #007bff;
+  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+  position: absolute;
+  top: 30px;
+  right: -30px;
+}
+
+.ribbon span::before {
+  content: "";
+  position: absolute;
+  left: 0px;
+  top: 100%;
+  z-index: -1;
+  border-left: 3px solid #004a99;
+  border-right: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid #004a99;
+}
+
+.ribbon span::after {
+  content: "";
+  position: absolute;
+  right: 0px;
+  top: 100%;
+  z-index: -1;
+  border-left: 3px solid transparent;
+  border-right: 3px solid #004a99;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid #004a99;
+}
+
+.ribbon-top-right {
+  top: -5px;
+  right: -5px;
+}
+
+/* Hover effects para cards */
+.hover-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Ícones circulares */
+.icon-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Melhorias para o tema escuro */
+.dark-mode .hover-card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Melhorias específicas para tabelas no tema escuro */
+.dark-mode .table th {
+  background-color: #2c3136 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.dark-mode .table td {
+  border-color: #495057;
+}
+
+/* Melhorias para cards de produtos no tema escuro */
+.dark-mode .produto-card,
+.dark-mode .hover-card {
+  background-color: #212529;
+  border-color: #495057;
+}
+
+.dark-mode .produto-card .card-header,
+.dark-mode .hover-card .card-header {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .produto-card .preco,
+.dark-mode .pricing .fw-bold {
+  color: #8adbff !important;
+}
+
+/* Adaptar elementos que estejam com contraste inadequado */
+.dark-mode .bg-light {
+  background-color: #212529 !important;
+}
+
+.dark-mode .p-2.border.rounded.bg-light {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  border-color: #495057 !important;
+}
+
+.dark-mode .text-muted {
+  color: #d1d1d1 !important;
+}
+
+/* Melhorias para mensagens de alerta no tema escuro */
+.dark-mode .alert {
+  border-color: #495057;
+}
+
+.dark-mode .alert-info {
+  background-color: rgba(23, 162, 184, 0.2) !important;
+  color: #d1d1d1 !important;
+  border-color: rgba(23, 162, 184, 0.4) !important;
+}
+
+.dark-mode .alert-light {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #d1d1d1 !important;
+  border-color: #495057 !important;
+}
+
+.dark-mode .alert h5, 
+.dark-mode .alert h6, 
+.dark-mode .alert p {
+  color: #ffffff !important;
+}
+
+/* Ajustes para textos em tabelas vazias no tema escuro */
+.dark-mode .table td[colspan] {
+  color: #d1d1d1 !important;
+}
+
+/* Melhorias para o destaque do estoque total */
+.alert-success .estoque-total {
+  color: #0f5132;
+  font-weight: 600;
+}
+
+.dark-mode .alert-success {
+  background-color: rgba(25, 135, 84, 0.2) !important;
+  color: #d1d1d1 !important;
+  border-color: rgba(25, 135, 84, 0.4) !important;
+}
+
+.dark-mode .alert-success .estoque-total {
+  color: #75e3a2 !important;
+  font-weight: 600;
+}
+
+.dark-mode .alert-success h6 {
+  color: #d4f5e0 !important;
+}
+
+/* Ajustes para tabelas responsivas */
+@media (max-width: 768px) {
+  .table-responsive {
+    border: 0;
+  }
+  
+  .dark-mode .table-responsive .table th {
+    background-color: #2c3136 !important;
+    color: #ffffff !important;
+  }
+} 

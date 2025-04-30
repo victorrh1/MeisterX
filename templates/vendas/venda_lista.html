@@ -1,0 +1,464 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - Gerencial SaaS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'cliente_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ titulo }}</li>
+        </ol>
+    </nav>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-0 text-primary">{{ titulo }}</h1>
+            <p class="text-muted">{{ subtitulo }}</p>
+        </div>
+        <div class="d-flex align-items-center">
+            <div class="form-check form-switch me-3">
+                <input class="form-check-input" type="checkbox" id="darkModeSwitch">
+                <label class="form-check-label" for="darkModeSwitch">Modo Escuro</label>
+            </div>
+            <a href="{% url 'venda_nova' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Nova Venda
+            </a>
+        </div>
+    </div>
+    
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">Resumo de Vendas</h5>
+                <a href="{% url 'venda_dashboard' %}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-chart-line me-1"></i>Dashboard
+                </a>
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title mb-0">Total de Vendas</h6>
+                                <h4 class="mt-2 mb-0">{{ total_vendas }}</h4>
+                            </div>
+                            <i class="fas fa-shopping-cart fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card bg-success text-white">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title mb-0">Concluídas</h6>
+                                <h4 class="mt-2 mb-0">{{ vendas_por_status.entregue }}</h4>
+                            </div>
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card bg-warning text-dark">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title mb-0">Pendentes</h6>
+                                <h4 class="mt-2 mb-0">{{ vendas_por_status.pendente }}</h4>
+                            </div>
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs para organizar tipos de vendas -->
+    <ul class="nav nav-tabs mb-4" id="vendasTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="recentes-tab" data-bs-toggle="tab" data-bs-target="#recentes" type="button" role="tab" aria-controls="recentes" aria-selected="true">
+                <i class="fas fa-shopping-cart me-1"></i> Vendas Recentes
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="processamento-tab" data-bs-toggle="tab" data-bs-target="#processamento" type="button" role="tab" aria-controls="processamento" aria-selected="false">
+                <i class="fas fa-clock me-1"></i> Em Processamento
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico" type="button" role="tab" aria-controls="historico" aria-selected="false">
+                <i class="fas fa-history me-1"></i> Histórico
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="envio-tab" data-bs-toggle="tab" data-bs-target="#envio" type="button" role="tab" aria-controls="envio" aria-selected="false">
+                <i class="fas fa-shipping-fast me-1"></i> Envios
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="vendasTabContent">
+        <!-- Tab Vendas Recentes -->
+        <div class="tab-pane fade show active" id="recentes" role="tabpanel" aria-labelledby="recentes-tab">
+            {% if vendas_recentes %}
+                <div class="row">
+                    {% for venda in vendas_recentes %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card border-0 shadow-sm hover-card h-100">
+                                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title fw-bold mb-0">Venda #{{ venda.id }}</h5>
+                                    {% if venda.status == 'rascunho' %}
+                                        <span class="badge bg-secondary">Rascunho</span>
+                                    {% elif venda.status == 'pendente' %}
+                                        <span class="badge bg-warning text-dark">Pagamento Pendente</span>
+                                    {% elif venda.status == 'pago' %}
+                                        <span class="badge bg-info">Pago</span>
+                                    {% elif venda.status == 'enviado' %}
+                                        <span class="badge bg-primary">Enviado</span>
+                                    {% elif venda.status == 'entregue' %}
+                                        <span class="badge bg-success">Entregue</span>
+                                    {% elif venda.status == 'cancelado' %}
+                                        <span class="badge bg-danger">Cancelado</span>
+                                    {% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span class="text-muted">Cliente:</span>
+                                            <span class="fw-medium">
+                                                {% if venda.cliente_cadastrado %}
+                                                    {{ venda.cliente_cadastrado.nome }}
+                                                {% else %}
+                                                    {{ venda.cliente_nome }}
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span class="text-muted">Data:</span>
+                                            <span class="fw-medium">{{ venda.data_venda|date:"d/m/Y H:i" }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span class="text-muted">Valor Total:</span>
+                                            <span class="fw-medium text-success">R$ {{ venda.valor_total|floatformat:2 }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span class="text-muted">Forma de Pagamento:</span>
+                                            <span class="fw-medium">{{ venda.forma_pagamento.nome }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if venda.itens.all %}
+                                        <h6 class="text-primary mb-2">Itens</h6>
+                                        <ul class="list-group list-group-flush mb-3">
+                                            {% for item in venda.itens.all|slice:":3" %}
+                                                <li class="list-group-item px-0 py-2 border-0 d-flex justify-content-between">
+                                                    <span>{{ item.produto.nome }}</span>
+                                                    <span class="fw-medium">{{ item.quantidade }}x</span>
+                                                </li>
+                                            {% endfor %}
+                                            {% if venda.itens.all|length > 3 %}
+                                                <li class="list-group-item px-0 py-2 border-0 text-center text-muted">
+                                                    <em>E mais {{ venda.itens.all|length|add:"-3" }} item(s)...</em>
+                                                </li>
+                                            {% endif %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer bg-white border-0 pt-0 pb-3">
+                                    <div class="d-grid gap-2">
+                                        <a href="{% url 'venda_detalhe' venda.id %}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i> Ver Detalhes
+                                        </a>
+                                        
+                                        {% if venda.status == 'rascunho' %}
+                                            <a href="{% url 'venda_editar' venda.id %}" class="btn btn-outline-success btn-sm">
+                                                <i class="fas fa-edit me-1"></i> Editar Venda
+                                            </a>
+                                        {% endif %}
+                                        
+                                        {% if venda.status == 'pendente' %}
+                                            <a href="{% url 'venda_confirmar_pagamento' venda.id %}" class="btn btn-success btn-sm">
+                                                <i class="fas fa-check-circle me-1"></i> Confirmar Pagamento
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Você não possui vendas recentes. Clique em "Nova Venda" para cadastrar.
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Tab Em Processamento (Pagas e Enviadas) -->
+        <div class="tab-pane fade" id="processamento" role="tabpanel" aria-labelledby="processamento-tab">
+            {% if vendas_processamento %}
+                <div class="row">
+                    {% for venda in vendas_processamento %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card border-0 shadow-sm hover-card h-100">
+                                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title fw-bold mb-0">Venda #{{ venda.id }}</h5>
+                                    {% if venda.status == 'pago' %}
+                                        <span class="badge bg-info">Pago</span>
+                                    {% elif venda.status == 'enviado' %}
+                                        <span class="badge bg-primary">Enviado</span>
+                                    {% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span class="text-muted">Cliente:</span>
+                                            <span class="fw-medium">
+                                                {% if venda.cliente_cadastrado %}
+                                                    {{ venda.cliente_cadastrado.nome }}
+                                                {% else %}
+                                                    {{ venda.cliente_nome }}
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span class="text-muted">Data:</span>
+                                            <span class="fw-medium">{{ venda.data_venda|date:"d/m/Y H:i" }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span class="text-muted">Valor Total:</span>
+                                            <span class="fw-medium text-success">R$ {{ venda.valor_total|floatformat:2 }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span class="text-muted">Método de Envio:</span>
+                                            <span class="fw-medium">{{ venda.metodo_envio.nome }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-0 pt-0 pb-3">
+                                    <div class="d-grid gap-2">
+                                        <a href="{% url 'venda_detalhe' venda.id %}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i> Ver Detalhes
+                                        </a>
+                                        
+                                        {% if venda.status == 'pago' %}
+                                            <a href="{% url 'venda_marcar_enviado' venda.id %}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-shipping-fast me-1"></i> Marcar como Enviado
+                                            </a>
+                                        {% endif %}
+                                        
+                                        {% if venda.status == 'enviado' %}
+                                            <a href="{% url 'venda_marcar_entregue' venda.id %}" class="btn btn-success btn-sm">
+                                                <i class="fas fa-box-open me-1"></i> Marcar como Entregue
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No momento, você não possui vendas em processamento.
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Tab Histórico (Entregues e Canceladas) -->
+        <div class="tab-pane fade" id="historico" role="tabpanel" aria-labelledby="historico-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID Venda</th>
+                                    <th>Data</th>
+                                    <th>Cliente</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if vendas_historico %}
+                                    {% for venda in vendas_historico %}
+                                        <tr>
+                                            <td>#{{ venda.id }}</td>
+                                            <td>{{ venda.data_venda|date:"d/m/Y" }}</td>
+                                            <td>
+                                                {% if venda.cliente_cadastrado %}
+                                                    {{ venda.cliente_cadastrado.nome }}
+                                                {% else %}
+                                                    {{ venda.cliente_nome }}
+                                                {% endif %}
+                                            </td>
+                                            <td>R$ {{ venda.valor_total|floatformat:2 }}</td>
+                                            <td>
+                                                {% if venda.status == 'entregue' %}
+                                                    <span class="badge bg-success">Entregue</span>
+                                                {% elif venda.status == 'cancelado' %}
+                                                    <span class="badge bg-danger">Cancelado</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'venda_detalhe' venda.id %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i> Detalhes
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4">
+                                            <div class="text-muted">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                Nenhuma venda concluída ou cancelada encontrada.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Envios -->
+        <div class="tab-pane fade" id="envio" role="tabpanel" aria-labelledby="envio-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {% if vendas_envio %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID Venda</th>
+                                        <th>Cliente</th>
+                                        <th>Método de Envio</th>
+                                        <th>Data de Envio</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for venda in vendas_envio %}
+                                        <tr>
+                                            <td>#{{ venda.id }}</td>
+                                            <td>
+                                                {% if venda.cliente_cadastrado %}
+                                                    {{ venda.cliente_cadastrado.nome }}
+                                                {% else %}
+                                                    {{ venda.cliente_nome }}
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ venda.metodo_envio.nome }}</td>
+                                            <td>{{ venda.data_envio|date:"d/m/Y"|default:"--" }}</td>
+                                            <td>
+                                                {% if venda.status == 'pago' %}
+                                                    <span class="badge bg-info">Aguardando Envio</span>
+                                                {% elif venda.status == 'enviado' %}
+                                                    <span class="badge bg-primary">Enviado</span>
+                                                {% elif venda.status == 'entregue' %}
+                                                    <span class="badge bg-success">Entregue</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="{% url 'venda_detalhe' venda.id %}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    
+                                                    {% if venda.status == 'pago' %}
+                                                        <a href="{% url 'venda_marcar_enviado' venda.id %}" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-shipping-fast"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                    
+                                                    {% if venda.status == 'enviado' %}
+                                                        <a href="{% url 'venda_marcar_entregue' venda.id %}" class="btn btn-sm btn-success">
+                                                            <i class="fas fa-box-open"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-info-circle me-3 fa-2x"></i>
+                                <div>
+                                    <h5 class="mb-1">Nenhum envio pendente</h5>
+                                    <p class="mb-0">Não há vendas para enviar ou em processo de entrega no momento.</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-card {
+        transition: transform 0.3s ease-in-out;
+    }
+    .hover-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    /* Estilo para as abas */
+    .nav-tabs .nav-link {
+        color: #555;
+        font-weight: 500;
+        padding: 0.75rem 1rem;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #4e73df;
+        font-weight: 600;
+        border-bottom: 3px solid #4e73df;
+    }
+    
+    .nav-tabs .nav-link:hover:not(.active) {
+        border-color: transparent;
+        background-color: rgba(78, 115, 223, 0.05);
+    }
+</style>
+
+{% block extra_js %}
+<script>
+    // Funcionalidade do modo escuro
+    const darkModeSwitch = document.getElementById('darkModeSwitch');
+    
+    // Verificar preferência salva
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+        darkModeSwitch.checked = true;
+    }
+    
+    // Alternar modo escuro
+    darkModeSwitch.addEventListener('change', function() {
+        if (this.checked) {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('darkMode', 'disabled');
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %} 

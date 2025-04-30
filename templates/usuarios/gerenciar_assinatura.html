@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho da página -->
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-sm mb-2 mb-sm-0">
+            <h1 class="page-header-title">{{ titulo }}</h1>
+            <p class="page-header-text">{{ subtitulo }}</p>
+        </div>
+        <div class="col-sm-auto">
+            <a href="{% url 'meus_produtos' %}" class="btn btn-soft-secondary">
+                <i class="bi-arrow-left me-1"></i> Voltar para Meus Produtos
+            </a>
+        </div>
+    </div>
+</div>
+<!-- Fim do cabeçalho -->
+
+<!-- Card principal de gerenciamento -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-header-title">Detalhes da Assinatura</h5>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h6>Informações do Produto</h6>
+                <dl class="row">
+                    <dt class="col-sm-4">Nome do Produto:</dt>
+                    <dd class="col-sm-8">{{ assinatura.produto.nome }}</dd>
+                    
+                    <dt class="col-sm-4">Descrição:</dt>
+                    <dd class="col-sm-8">{{ assinatura.produto.descricao }}</dd>
+                    
+                    <dt class="col-sm-4">Valor:</dt>
+                    <dd class="col-sm-8">R$ {{ assinatura.produto.preco|floatformat:2 }}</dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <h6>Status da Assinatura</h6>
+                <dl class="row">
+                    <dt class="col-sm-4">Status:</dt>
+                    <dd class="col-sm-8">
+                        {% if assinatura.status == 'ativo' %}
+                            {% if assinatura.esta_ativo %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-warning">Expirado</span>
+                            {% endif %}
+                        {% elif assinatura.status == 'pendente' %}
+                            <span class="badge bg-warning">Pendente</span>
+                        {% elif assinatura.status == 'cancelado' %}
+                            <span class="badge bg-danger">Cancelado</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ assinatura.status }}</span>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-4">Data de Início:</dt>
+                    <dd class="col-sm-8">{{ assinatura.data_inicio|date:"d/m/Y" }}</dd>
+                    
+                    <dt class="col-sm-4">Data de Expiração:</dt>
+                    <dd class="col-sm-8">{{ assinatura.data_expiracao|date:"d/m/Y" }}</dd>
+                    
+                    <dt class="col-sm-4">Dias Restantes:</dt>
+                    <dd class="col-sm-8">
+                        {% if assinatura.esta_ativo %}
+                            {{ assinatura.dias_restantes }} dia(s)
+                        {% else %}
+                            <span class="text-danger">Expirado</span>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-4">Renovação Automática:</dt>
+                    <dd class="col-sm-8">
+                        {% if assinatura.renovacao_automatica %}
+                            <span class="badge bg-primary">Ativada</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Desativada</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <!-- Barra de progresso de tempo restante -->
+        {% if assinatura.esta_ativo %}
+        <div class="mb-4">
+            <h6>Tempo Restante</h6>
+            <div class="progress" style="height: 10px;">
+                {% with percentual=assinatura.get_percentual_tempo_restante %}
+                <div class="progress-bar {% if percentual < 20 %}bg-danger{% elif percentual < 50 %}bg-warning{% else %}bg-success{% endif %}" 
+                     role="progressbar" 
+                     style="width: {{ percentual }}%;" 
+                     aria-valuenow="{{ percentual }}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                </div>
+                {% endwith %}
+            </div>
+            <small class="text-muted">
+                {% if assinatura.dias_restantes > 0 %}
+                    Sua assinatura expira em {{ assinatura.dias_restantes }} dia(s)
+                {% else %}
+                    Sua assinatura expirou
+                {% endif %}
+            </small>
+        </div>
+        {% endif %}
+
+        <!-- Ações da assinatura -->
+        <div class="mt-4">
+            <h6>Gerenciar Assinatura</h6>
+            <div class="d-flex flex-wrap gap-2">
+                {% if assinatura.status != 'cancelado' %}
+                    {% if not assinatura.renovacao_automatica %}
+                        <a href="{% url 'renovar_assinatura' assinatura.id %}" class="btn btn-primary">
+                            <i class="bi-arrow-repeat me-1"></i> Renovar Assinatura
+                        </a>
+                    {% endif %}
+                    
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelarAssinaturaModal">
+                        <i class="bi-x-circle me-1"></i> Cancelar Assinatura
+                    </button>
+                    
+                    <!-- Toggle renovação automática -->
+                    <form method="post" action="{% url 'gerenciar_assinatura' assinatura.id %}" class="ms-auto">
+                        {% csrf_token %}
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="renovacaoAutomatica" 
+                                {% if assinatura.renovacao_automatica %}checked{% endif %} name="renovacao_automatica" 
+                                onchange="this.form.submit()">
+                            <label class="form-check-label" for="renovacaoAutomatica">
+                                Renovação Automática
+                            </label>
+                        </div>
+                    </form>
+                {% else %}
+                    <p class="text-danger">Esta assinatura foi cancelada e não pode ser gerenciada.</p>
+                    <a href="{% url 'contratar_plano' assinatura.produto.id %}" class="btn btn-primary">
+                        <i class="bi-cart me-1"></i> Contratar Novamente
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Histórico de Faturamento (Exemplo) -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="card-header-title">Histórico de Faturamento</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-borderless">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Data</th>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Exemplos de faturas - Em um caso real, você poderia iterar sobre faturas do banco de dados -->
+                    <tr>
+                        <td>{{ assinatura.data_inicio|date:"d/m/Y" }}</td>
+                        <td>Assinatura inicial - {{ assinatura.produto.nome }}</td>
+                        <td>R$ {{ assinatura.produto.preco|floatformat:2 }}</td>
+                        <td><span class="badge bg-success">Pago</span></td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-soft-info">
+                                <i class="bi-file-earmark-text"></i> Ver Fatura
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de cancelamento de assinatura -->
+<div class="modal fade" id="cancelarAssinaturaModal" tabindex="-1" aria-labelledby="cancelarAssinaturaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelarAssinaturaModalLabel">Confirmar Cancelamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja cancelar sua assinatura de <strong>{{ assinatura.produto.nome }}</strong>?</p>
+                <ul class="text-danger">
+                    <li>Seu acesso será mantido até a data de expiração atual ({{ assinatura.data_expiracao|date:"d/m/Y" }}).</li>
+                    <li>A renovação automática será desativada.</li>
+                    <li>Você poderá perder promoções ou condições especiais atuais.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
+                <a href="{% url 'cancelar_assinatura' assinatura.id %}" class="btn btn-danger">Confirmar Cancelamento</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

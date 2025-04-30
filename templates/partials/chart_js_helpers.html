@@ -1,0 +1,40 @@
+{% comment %}
+Arquivo de template parcial com funções auxiliares para os gráficos Chart.js
+Isso ajuda a evitar duplicação de código e erros de linter
+{% endcomment %}
+
+<script>
+  // Script para inicializar um gráfico de linha básico
+  function initLineChart(canvasId, labels, data, color) {
+    color = color || '#0d6efd'; // Cor padrão: azul
+    
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Vendas',
+          data: data,
+          fill: true,
+          borderColor: color,
+          backgroundColor: color.replace(')', ', 0.1)').replace('rgb', 'rgba'),
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { 
+            display: false 
+          }
+        },
+        scales: {
+          y: { 
+            beginAtZero: true 
+          }
+        }
+      }
+    });
+  }
+</script> 

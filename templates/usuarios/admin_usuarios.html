@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciar Usuários - Gerencial SaaS{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>{{ titulo }}</h2>
+            <p class="text-muted">{{ subtitulo }}</p>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Usuários Pendentes -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">
+                <i class="fas fa-user-clock"></i> Usuários Pendentes de Aprovação
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if usuarios_pendentes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Data de Registro</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for perfil in usuarios_pendentes %}
+                                <tr>
+                                    <td>{{ perfil.user.get_full_name|default:perfil.user.username }}</td>
+                                    <td>{{ perfil.user.email }}</td>
+                                    <td>{{ perfil.registration_date|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <a href="{% url 'aprovar_usuario' perfil.user.id %}" class="btn btn-sm btn-success">
+                                            <i class="fas fa-check"></i> Aprovar
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle"></i> Não há usuários pendentes de aprovação.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Usuários Aprovados -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-user-check"></i> Usuários Aprovados
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if usuarios_aprovados %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Data de Registro</th>
+                                <th>Data de Aprovação</th>
+                                <th>Grupos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for perfil in usuarios_aprovados %}
+                                <tr>
+                                    <td>{{ perfil.user.get_full_name|default:perfil.user.username }}</td>
+                                    <td>{{ perfil.user.email }}</td>
+                                    <td>{{ perfil.registration_date|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ perfil.approval_date|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        {% for group in perfil.user.groups.all %}
+                                            <span class="badge bg-primary">{{ group.name }}</span>
+                                        {% empty %}
+                                            <span class="badge bg-secondary">Sem grupo</span>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle"></i> Não há usuários aprovados.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

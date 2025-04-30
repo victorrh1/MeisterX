@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load core_extras %}
+
+{% block title %}Painel da Equipe{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card-dashboard {
+        transition: all 0.3s;
+    }
+    .card-dashboard:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .icon-circle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+    .dark-mode {
+        background-color: #343a40;
+        color: #f8f9fa;
+    }
+    .dark-mode .card {
+        background-color: #212529;
+        color: #f8f9fa;
+    }
+    .dark-mode .text-dark {
+        color: #f8f9fa !important;
+    }
+    .dark-mode .bg-light {
+        background-color: #343a40 !important;
+    }
+    .dark-mode .text-muted {
+        color: #adb5bd !important;
+    }
+    .dark-mode .border {
+        border-color: #495057 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h1 class="h2">Painel da Equipe</h1>
+        <p class="text-muted">Acesso rápido às funcionalidades</p>
+    </div>
+    <div class="col-auto">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="darkModeSwitch">
+            <label class="form-check-label" for="darkModeSwitch">Modo Escuro</label>
+        </div>
+    </div>
+</div>
+
+<!-- Cards Dinâmicos baseados no grupo do usuário -->
+{% include 'partials/cards_dinamicos.html' with view_context=view_context %}
+
+<!-- Resumo de Atividades -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+            <div class="icon-circle bg-warning bg-opacity-10 text-warning me-3">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <h5 class="card-title mb-0 text-warning">Tarefas Pendentes</h5>
+        </div>
+        
+        <div class="list-group list-group-flush">
+            <div class="list-group-item d-flex justify-content-between align-items-center px-0 border-0 mb-3">
+                <div>
+                    <h6 class="mb-1">Atualizar inventário</h6>
+                    <p class="text-muted small mb-0">Vencimento: Hoje</p>
+                </div>
+                <span class="badge bg-danger rounded-pill">Urgente</span>
+            </div>
+            <div class="list-group-item d-flex justify-content-between align-items-center px-0 border-0 mb-3">
+                <div>
+                    <h6 class="mb-1">Contatar cliente #1024</h6>
+                    <p class="text-muted small mb-0">Vencimento: Amanhã</p>
+                </div>
+                <span class="badge bg-warning text-dark rounded-pill">Média</span>
+            </div>
+            <div class="list-group-item d-flex justify-content-between align-items-center px-0 border-0">
+                <div>
+                    <h6 class="mb-1">Reunião de equipe</h6>
+                    <p class="text-muted small mb-0">Vencimento: 24/04/2025</p>
+                </div>
+                <span class="badge bg-info rounded-pill">Baixa</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer bg-transparent border-top">
+        <a href="#" class="text-decoration-none text-warning">Ver todas as tarefas</a>
+    </div>
+</div>
+
+<!-- Clientes e Produtos Recentes -->
+<div class="row mb-4">
+    <!-- Clientes Recentes -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="icon-circle bg-primary bg-opacity-10 text-primary me-3">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h5 class="card-title mb-0 text-primary">Clientes Recentes</h5>
+                </div>
+                
+                {% if clientes_ativos %}
+                <div class="list-group list-group-flush">
+                    {% for cliente in clientes_ativos|slice:":3" %}
+                    <div class="list-group-item px-0 border-0 mb-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>{{ cliente.nome }}</span>
+                            <a href="#" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-light">
+                    Nenhum cliente cadastrado recentemente.
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-transparent border-top">
+                <a href="{% url 'cliente_lista' %}" class="text-decoration-none text-primary">Ver todos os clientes</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Produtos Recentes -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="icon-circle bg-success bg-opacity-10 text-success me-3">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <h5 class="card-title mb-0 text-success">Produtos Recentes</h5>
+                </div>
+                
+                {% if produtos_recentes %}
+                <div class="list-group list-group-flush">
+                    {% for produto in produtos_recentes|slice:":3" %}
+                    <div class="list-group-item px-0 border-0 mb-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>{{ produto.nome }}</span>
+                            <a href="#" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-light">
+                    Nenhum produto cadastrado recentemente.
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-transparent border-top">
+                <a href="{% url 'produto_lista' %}" class="text-decoration-none text-success">Ver todos os produtos</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Funcionalidade do modo escuro
+    const darkModeSwitch = document.getElementById('darkModeSwitch');
+    
+    // Verificar preferência salva
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+        darkModeSwitch.checked = true;
+    }
+    
+    // Alternar modo escuro
+    darkModeSwitch.addEventListener('change', function() {
+        if (this.checked) {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('darkMode', 'disabled');
+        }
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Administrativo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .icon-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+    .status-badge {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    .status-badge.pending {
+        background-color: #ffc107;
+    }
+    .status-badge.approved {
+        background-color: #28a745;
+    }
+    .status-badge.rejected {
+        background-color: #dc3545;
+    }
+    .action-button {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        margin: 0 3px;
+    }
+    .action-button.approve {
+        background-color: #28a745;
+        color: white;
+    }
+    .action-button.reject {
+        background-color: #dc3545;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2">Dashboard Administrativo</h1>
+        </div>
+    </div>
+
+    <!-- Usuários Pendentes de Aprovação -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-warning text-dark">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-user-clock me-2"></i> Usuários Pendentes de Aprovação
+                </h3>
+                <a href="{% url 'admin_usuarios' %}" class="btn btn-dark btn-sm">
+                    <i class="fas fa-cog me-1"></i> Gerenciamento Avançado
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if usuarios_pendentes %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Usuário</th>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Data de Registro</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for perfil in usuarios_pendentes %}
+                        <tr>
+                            <td>
+                                <span class="status-badge pending"></span>
+                                {{ perfil.user.username }}
+                            </td>
+                            <td>{{ perfil.user.get_full_name|default:"-" }}</td>
+                            <td>{{ perfil.user.email }}</td>
+                            <td>{{ perfil.registration_date|date:"d/m/Y H:i" }}</td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center">
+                                    <form method="post" action="{% url 'aprovar_usuario' perfil.user.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="action-button approve" title="Aprovar">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <form method="post" action="{% url 'rejeitar_usuario' perfil.user.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="action-button reject" title="Rejeitar">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> Não há usuários pendentes de aprovação.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Card de Usuários -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-primary bg-opacity-10 text-primary me-3">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Gerenciar Usuários</h5>
+                    </div>
+                    <p class="text-muted">Controle os usuários do sistema.</p>
+                    <div class="mt-3">
+                        <a href="{% url 'admin_usuarios' %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-user-check me-1"></i> Aprovar Usuários
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-top">
+                    <a href="{% url 'admin_usuarios' %}" class="text-decoration-none text-primary">Ver todos</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card de Relatórios -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-success bg-opacity-10 text-success me-3">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Relatórios</h5>
+                    </div>
+                    <p class="text-muted">Visualize relatórios detalhados.</p>
+                </div>
+                <div class="card-footer bg-transparent border-top">
+                    <a href="#" class="text-decoration-none text-success">Ver relatórios</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card de Configurações -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-info bg-opacity-10 text-info me-3">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Configurações</h5>
+                    </div>
+                    <p class="text-muted">Configure o sistema.</p>
+                </div>
+                <div class="card-footer bg-transparent border-top">
+                    <a href="#" class="text-decoration-none text-info">Configurar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Usuários Cadastrados -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-users me-2"></i> Usuários Cadastrados
+                </h3>
+                <a href="{% url 'admin:usuarios_usuario_changelist' %}" class="btn btn-light btn-sm">
+                    <i class="fas fa-edit me-1"></i> Gerenciar no Admin
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if usuarios_aprovados %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Usuário</th>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Grupo</th>
+                            <th>Data de Aprovação</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for perfil in usuarios_aprovados %}
+                        <tr>
+                            <td>
+                                <span class="status-badge approved"></span>
+                                {{ perfil.user.username }}
+                            </td>
+                            <td>{{ perfil.user.get_full_name|default:"-" }}</td>
+                            <td>{{ perfil.user.email }}</td>
+                            <td>
+                                {% for group in perfil.user.groups.all %}
+                                <span class="badge bg-primary">{{ group.name }}</span>
+                                {% empty %}
+                                <span class="badge bg-secondary">Sem grupo</span>
+                                {% endfor %}
+                            </td>
+                            <td>{{ perfil.approval_date|date:"d/m/Y H:i"|default:"-" }}</td>
+                            <td>
+                                {% if perfil.user.is_active %}
+                                <span class="badge bg-success">Ativo</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> Não há usuários aprovados no sistema.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Clientes Cadastrados -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-users me-2"></i> Clientes Cadastrados
+                </h3>
+                <a href="{% url 'admin:usuarios_usuario_changelist' %}?groups__name=Cliente" class="btn btn-light btn-sm">
+                    <i class="fas fa-edit me-1"></i> Gerenciar Clientes
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if clientes_usuarios %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Usuário</th>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Data de Cadastro</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in clientes_usuarios %}
+                        <tr>
+                            <td>
+                                <span class="status-badge approved"></span>
+                                {{ usuario.username }}
+                            </td>
+                            <td>{{ usuario.get_full_name|default:"-" }}</td>
+                            <td>{{ usuario.email }}</td>
+                            <td>{{ usuario.date_joined|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if usuario.is_active %}
+                                <span class="badge bg-success">Ativo</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> Não há clientes cadastrados no sistema.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Gráfico de Vendas -->
+    <div class="card mt-4 border-0 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Vendas nos últimos 7 dias</h5>
+            <canvas id="vendasChart" height="100"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Dados do gráfico definidos como JSON global para evitar problemas de linter -->
+<script type="application/json" id="chart-data">
+    {
+        "labels": {{ labels|safe }},
+        "data": {{ data|safe }}
+    }
+</script>
+
+{% include 'partials/chart_js_helpers.html' %}
+<script>
+    // Inicializa o gráfico quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        // Recupera os dados do JSON
+        const chartDataElement = document.getElementById('chart-data');
+        const chartConfig = JSON.parse(chartDataElement.textContent);
+        
+        // Inicializa o gráfico com os dados recuperados
+        initLineChart('vendasChart', chartConfig.labels, chartConfig.data);
+    });
+</script>
+{% endblock %} 

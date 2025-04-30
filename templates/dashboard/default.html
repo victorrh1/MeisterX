@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0">
+                    <h6>Bem-vindo ao Dashboard</h6>
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        {% if user.groups.all.0.name == 'Admin' %}
+                            <div class="p-4">
+                                <h4>Painel Administrativo</h4>
+                                <div class="row mt-4">
+                                    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+                                        <div class="card">
+                                            <div class="card-body p-3">
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <div class="numbers">
+                                                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Usuários</p>
+                                                            <h5 class="font-weight-bolder mb-0">
+                                                                {{ total_usuarios }}
+                                                            </h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4 text-end">
+                                                        <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+                                                            <i class="ni ni-single-02 text-lg opacity-10" aria-hidden="true"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+                                        <div class="card">
+                                            <div class="card-body p-3">
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <div class="numbers">
+                                                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Vendas</p>
+                                                            <h5 class="font-weight-bolder mb-0">
+                                                                {{ total_vendas }}
+                                                            </h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4 text-end">
+                                                        <div class="icon icon-shape bg-gradient-success shadow text-center border-radius-md">
+                                                            <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% elif user.groups.all.0.name == 'Equipe' %}
+                            <div class="p-4">
+                                <h4>Painel da Equipe</h4>
+                                <div class="row mt-4">
+                                    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+                                        <div class="card">
+                                            <div class="card-body p-3">
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <div class="numbers">
+                                                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Clientes</p>
+                                                            <h5 class="font-weight-bolder mb-0">
+                                                                {{ total_clientes }}
+                                                            </h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4 text-end">
+                                                        <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                                            <i class="ni ni-paper-diploma text-lg opacity-10" aria-hidden="true"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 col-sm-6">
+                                        <div class="card">
+                                            <div class="card-body p-3">
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <div class="numbers">
+                                                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Produtos</p>
+                                                            <h5 class="font-weight-bolder mb-0">
+                                                                {{ total_produtos }}
+                                                            </h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4 text-end">
+                                                        <div class="icon icon-shape bg-gradient-warning shadow text-center border-radius-md">
+                                                            <i class="ni ni-cart text-lg opacity-10" aria-hidden="true"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="p-4">
+                                <h4>Painel do Cliente</h4>
+                                <div class="row mt-4">
+                                    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+                                        <div class="card">
+                                            <div class="card-body p-3">
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <div class="numbers">
+                                                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Minhas Compras</p>
+                                                            <h5 class="font-weight-bolder mb-0">
+                                                                {{ total_compras }}
+                                                            </h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4 text-end">
+                                                        <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+                                                            <i class="ni ni-cart text-lg opacity-10" aria-hidden="true"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Adicione aqui qualquer JavaScript específico do dashboard
+</script>
+{% endblock %} 

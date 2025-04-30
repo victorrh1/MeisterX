@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - Gerencial SaaS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'cliente_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'cliente_lista' %}">Clientes</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ cliente.nome }}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-0 text-primary">{{ titulo }}</h1>
+            <p class="text-muted">{{ subtitulo }}</p>
+        </div>
+        <div>
+            <a href="{% url 'cliente_editar' cliente.id %}" class="btn btn-outline-primary me-2">
+                <i class="fas fa-edit me-2"></i>Editar
+            </a>
+            <a href="{% url 'cliente_lista' %}" class="btn btn-outline-dark">
+                <i class="fas fa-arrow-left me-2"></i>Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title border-bottom pb-3 mb-4">Informações Pessoais</h5>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Nome Completo</label>
+                                <p class="fw-medium">{{ cliente.nome }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">CPF/CNPJ</label>
+                                <p class="fw-medium">{{ cliente.cpf_cnpj }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">E-mail</label>
+                                <p class="fw-medium">{{ cliente.email }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Telefone</label>
+                                <p class="fw-medium">{{ cliente.telefone }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="card-title border-bottom pb-3 mb-4">Endereço</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Endereço Completo</label>
+                                <p class="fw-medium">{{ cliente.endereco }}, {{ cliente.cidade }} - {{ cliente.estado }}, {{ cliente.cep }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title border-bottom pb-3 mb-4">Informações Adicionais</h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Data de Cadastro</label>
+                        <p class="fw-medium">{{ cliente.data_cadastro|date:"d/m/Y" }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Status</label>
+                        <p>
+                            {% if cliente.ativo %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

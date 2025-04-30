@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }} | Gerencial SaaS{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'cliente_empresa_lista' %}">Clientes</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'cliente_empresa_editar' id=cliente.id %}">{{ cliente.nome }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ titulo }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">{{ titulo }}</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.tipo.id_for_label }}">Tipo de Endereço *</label>
+                            {{ form.tipo }}
+                            {% if is_principal %}
+                            <input type="hidden" name="{{ form.tipo.html_name }}" value="principal">
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const select = document.getElementById('{{ form.tipo.id_for_label }}');
+                                    if (select) {
+                                        select.value = 'principal';
+                                        select.disabled = true;
+                                    }
+                                });
+                            </script>
+                            {% endif %}
+                            {% if form.tipo.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.tipo.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.nome.id_for_label }}">Nome do Endereço</label>
+                            {{ form.nome }}
+                            {% if form.nome.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.nome.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.logradouro.id_for_label }}">Logradouro *</label>
+                            {{ form.logradouro }}
+                            {% if form.logradouro.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.logradouro.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.numero.id_for_label }}">Número *</label>
+                            {{ form.numero }}
+                            {% if form.numero.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.numero.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.complemento.id_for_label }}">Complemento</label>
+                            {{ form.complemento }}
+                            {% if form.complemento.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.complemento.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.bairro.id_for_label }}">Bairro *</label>
+                            {{ form.bairro }}
+                            {% if form.bairro.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.bairro.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-5">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.cidade.id_for_label }}">Cidade *</label>
+                            {{ form.cidade }}
+                            {% if form.cidade.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.cidade.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.estado.id_for_label }}">Estado *</label>
+                            {{ form.estado }}
+                            {% if form.estado.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.estado.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.cep.id_for_label }}">CEP *</label>
+                            {{ form.cep }}
+                            {% if form.cep.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.cep.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>{{ botao }}
+                    </button>
+                    <a href="{% url 'cliente_empresa_editar' id=cliente.id %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Máscara para o campo CEP
+    const cepInput = document.querySelector('input[name$="cep"]');
+    if (cepInput) {
+        cepInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 5) {
+                value = value.substring(0, 5) + '-' + value.substring(5, 8);
+            }
+            e.target.value = value;
+        });
+    }
+});
+</script>
+{% endblock %} 

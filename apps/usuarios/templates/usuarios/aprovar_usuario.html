@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="card-title mb-0">{{ titulo }}</h2>
+            <p class="mb-0">{{ subtitulo }}</p>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Informações do Usuário</h4>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Nome de Usuário</th>
+                            <td>{{ usuario.username }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nome Completo</th>
+                            <td>{{ usuario.get_full_name|default:"Não informado" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>{{ usuario.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>Data de Registro</th>
+                            <td>{{ perfil.registration_date|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>
+                                {% if perfil.pending_approval %}
+                                <span class="badge bg-warning">Pendente de Aprovação</span>
+                                {% elif perfil.is_approved %}
+                                <span class="badge bg-success">Aprovado</span>
+                                {% else %}
+                                <span class="badge bg-danger">Reprovado</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h4>Ações</h4>
+                            <p>
+                                Ao aprovar este usuário, ele será adicionado ao grupo <strong>Cliente</strong> e 
+                                poderá acessar o sistema.
+                            </p>
+                            <p>
+                                Um e-mail de confirmação será enviado para o usuário informando que sua conta foi aprovada.
+                            </p>
+                            
+                            <div class="mt-auto">
+                                <form method="post" class="mb-2">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="fas fa-check-circle me-2"></i> Aprovar Usuário
+                                    </button>
+                                </form>
+                                <a href="{% url 'admin_usuarios' %}" class="btn btn-outline-secondary w-100">
+                                    <i class="fas fa-arrow-left me-2"></i> Voltar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

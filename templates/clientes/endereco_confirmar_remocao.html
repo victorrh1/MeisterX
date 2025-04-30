@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirmar Remoção de Endereço | Gerencial SaaS{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'cliente_empresa_lista' %}">Clientes</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'cliente_empresa_editar' id=cliente.id %}">{{ cliente.nome }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Remover Endereço</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Confirmar Remoção de Endereço</h4>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Atenção!</strong> Você está prestes a remover um endereço. Esta ação não pode ser desfeita.
+            </div>
+            
+            <h5 class="card-title">Detalhes do Endereço</h5>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <p><strong>Tipo:</strong> {{ endereco.get_tipo_display }}</p>
+                    {% if endereco.nome %}
+                    <p><strong>Nome:</strong> {{ endereco.nome }}</p>
+                    {% endif %}
+                    <p><strong>Endereço Completo:</strong> {{ endereco.endereco_completo }}</p>
+                </div>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'cliente_empresa_editar' id=cliente.id %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-2"></i>Confirmar Remoção
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - Gerencial SaaS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'cliente_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'venda_lista' %}">Vendas</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ titulo }}</li>
+        </ol>
+    </nav>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-0 text-primary">{{ titulo }}</h1>
+            <p class="text-muted">{{ subtitulo }}</p>
+        </div>
+        <div class="d-flex align-items-center">
+            <div class="form-check form-switch me-3">
+                <input class="form-check-input" type="checkbox" id="darkModeSwitch">
+                <label class="form-check-label" for="darkModeSwitch">Modo Escuro</label>
+            </div>
+            <a href="{% url 'venda_nova' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Nova Venda
+            </a>
+        </div>
+    </div>
+    
+    <!-- Cards de Estatísticas -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 bg-primary text-white">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-white-50">Vendas do Mês</h6>
+                        <h2 class="card-title mb-0">{{ total_vendas_mes }}</h2>
+                    </div>
+                    <i class="fas fa-shopping-cart fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 bg-success text-white">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-white-50">Faturamento do Mês</h6>
+                        <h2 class="card-title mb-0">R$ {{ valor_total_mes|floatformat:2 }}</h2>
+                    </div>
+                    <i class="fas fa-dollar-sign fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 bg-info text-white">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-white-50">Ticket Médio</h6>
+                        <h2 class="card-title mb-0">
+                            {% if total_vendas_mes > 0 %}
+                                R$ {{ valor_total_mes|floatformat:2|default:"0.00" }}
+                            {% else %}
+                                R$ 0,00
+                            {% endif %}
+                        </h2>
+                    </div>
+                    <i class="fas fa-receipt fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Vendas Recentes -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="card-title mb-0">Vendas Recentes</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if vendas_recentes %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Data</th>
+                                        <th>Status</th>
+                                        <th>Valor</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for venda in vendas_recentes %}
+                                    <tr>
+                                        <td>#{{ venda.id }}</td>
+                                        <td>
+                                            {% if venda.cliente_cadastrado %}
+                                                {{ venda.cliente_cadastrado.nome }}
+                                            {% else %}
+                                                {{ venda.cliente_nome }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ venda.data_venda|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            {% if venda.status == 'rascunho' %}
+                                                <span class="badge bg-secondary">Rascunho</span>
+                                            {% elif venda.status == 'pendente' %}
+                                                <span class="badge bg-warning text-dark">Pendente</span>
+                                            {% elif venda.status == 'pago' %}
+                                                <span class="badge bg-info">Pago</span>
+                                            {% elif venda.status == 'enviado' %}
+                                                <span class="badge bg-primary">Enviado</span>
+                                            {% elif venda.status == 'entregue' %}
+                                                <span class="badge bg-success">Entregue</span>
+                                            {% elif venda.status == 'cancelado' %}
+                                                <span class="badge bg-danger">Cancelado</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>R$ {{ venda.valor_total|floatformat:2 }}</td>
+                                        <td>
+                                            <a href="{% url 'venda_detalhe' venda.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer bg-white border-0 text-end">
+                            <a href="{% url 'venda_lista' %}" class="btn btn-outline-primary btn-sm">
+                                Ver todas as vendas <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info m-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Você ainda não possui vendas registradas.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0">
+                    <h5 class="card-title mb-0">Produtos Mais Vendidos</h5>
+                </div>
+                <div class="card-body">
+                    {% if produtos_mais_vendidos %}
+                        <div class="list-group list-group-flush">
+                            {% for produto in produtos_mais_vendidos %}
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">{{ produto.produto__nome }}</h6>
+                                    <small class="text-muted">{{ produto.total_quantidade }} unidades</small>
+                                </div>
+                                <span class="badge bg-success rounded-pill">R$ {{ produto.total_valor|floatformat:2 }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Não há dados de produtos vendidos para exibir.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Funcionalidade do modo escuro
+    const darkModeSwitch = document.getElementById('darkModeSwitch');
+    
+    // Verificar preferência salva
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+        darkModeSwitch.checked = true;
+    }
+    
+    // Alternar modo escuro
+    darkModeSwitch.addEventListener('change', function() {
+        if (this.checked) {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('darkMode', 'disabled');
+        }
+    });
+</script>
+{% endblock %} 

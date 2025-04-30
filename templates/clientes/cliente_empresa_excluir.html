@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }} - Gerencial SaaS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'cliente_empresa_lista' %}">Meus Clientes</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ titulo }}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-danger mb-0">{{ titulo }}</h2>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="darkModeSwitch">
+                    <label class="form-check-label" for="darkModeSwitch">Modo Escuro</label>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent py-3">
+                    <h3 class="card-title text-danger mb-0">{{ titulo }}</h3>
+                    <p class="text-muted mb-0">{{ subtitulo }}</p>
+                </div>
+                <div class="card-body p-4">
+                    <p>Esta ação não pode ser desfeita.</p>
+                    
+                    <div class="alert alert-warning">
+                        <p class="mb-0"><strong>Informações do cliente:</strong></p>
+                        <ul class="mb-0">
+                            <li><strong>Nome:</strong> {{ cliente.nome }}</li>
+                            <li><strong>Email:</strong> {{ cliente.email }}</li>
+                            <li><strong>Telefone:</strong> {{ cliente.telefone }}</li>
+                            {% if cliente.empresa %}
+                            <li><strong>Empresa:</strong> {{ cliente.empresa }}</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{% url 'cliente_empresa_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Funcionalidade do modo escuro
+    const darkModeSwitch = document.getElementById('darkModeSwitch');
+    
+    // Verificar preferência salva
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+        darkModeSwitch.checked = true;
+    }
+    
+    // Alternar modo escuro
+    darkModeSwitch.addEventListener('change', function() {
+        if (this.checked) {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('darkMode', 'disabled');
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %} 

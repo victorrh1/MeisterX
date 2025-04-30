@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }} - Gerencial SaaS{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilo do campo de upload de arquivo */
+    .input-group .form-control[type="file"] {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+    }
+    
+    /* Botão personalizado para upload de arquivo */
+    .custom-file-upload {
+        position: relative;
+        display: block;
+        overflow: hidden;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 0;
+        margin-bottom: 10px;
+    }
+    
+    /* Versão compacta do campo de upload */
+    .compact-upload {
+        display: flex;
+        align-items: center;
+        height: 38px;
+    }
+    
+    .compact-upload .file-label {
+        width: 80px;
+        display: inline-block;
+        padding: 7px 10px;
+        text-align: center;
+        background-color: #f8f9fa;
+        color: #212529;
+        cursor: pointer;
+        border-right: 1px solid #ccc;
+        font-size: 0.9rem;
+    }
+    
+    .compact-upload .file-name {
+        display: inline-block;
+        padding: 7px 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: calc(100% - 80px);
+        vertical-align: middle;
+        font-size: 0.9rem;
+    }
+    
+    .custom-file-upload input[type="file"] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+    
+    /* Melhorias para o tema escuro */
+    .dark-mode .form-text {
+        color: #adb5bd !important;
+    }
+    
+    .dark-mode .form-label {
+        color: #e9ecef !important;
+    }
+    
+    .dark-mode .form-check-label {
+        color: #e9ecef !important;
+    }
+    
+    .dark-mode .custom-file-upload {
+        border-color: #495057;
+    }
+    
+    .dark-mode .custom-file-upload .file-label {
+        background-color: #343a40;
+        color: #e9ecef;
+        border-color: #495057;
+    }
+    
+    .dark-mode .custom-file-upload .file-name {
+        color: #adb5bd;
+    }
+    
+    /* Corrige inputs no tema escuro */
+    .dark-mode .form-control {
+        background-color: #343a40 !important;
+        color: #e9ecef !important;
+        border-color: #495057 !important;
+    }
+    
+    .dark-mode .form-control:focus {
+        background-color: #343a40 !important;
+        color: #e9ecef !important;
+        border-color: #80bdff !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    }
+    
+    .dark-mode .form-control::placeholder {
+        color: #6c757d !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'cliente_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'produto_empresa_lista' %}">Meus Produtos</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ titulo }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-primary">{{ titulo }}</h2>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="darkModeSwitch">
+                    <label class="form-check-label" for="darkModeSwitch">Modo Escuro</label>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent py-3">
+                    <h3 class="card-title text-primary mb-0">{{ titulo }}</h3>
+                    <p class="text-muted small mb-0">{{ subtitulo }}</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.nome.id_for_label }}" class="form-label">Nome do Produto *</label>
+                                    {{ form.nome }}
+                                    {% if form.nome.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.nome.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="{{ form.preco.id_for_label }}" class="form-label">Preço *</label>
+                                            {{ form.preco }}
+                                            {% if form.preco.errors %}
+                                                <div class="text-danger">
+                                                    {% for error in form.preco.errors %}
+                                                        {{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="{{ form.estoque.id_for_label }}" class="form-label">Quantidade em Estoque *</label>
+                                            {{ form.estoque }}
+                                            {% if form.estoque.errors %}
+                                                <div class="text-danger">
+                                                    {% for error in form.estoque.errors %}
+                                                        {{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            <div class="form-text">O controle de estoque aparecerá em seu dashboard</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.imagem.id_for_label }}" class="form-label">Imagem do Produto</label>
+                                    <div class="custom-file-upload compact-upload" id="customFileUpload">
+                                        <span class="file-label">Escolher</span>
+                                        <span class="file-name" id="file-name">Nenhum arquivo escolhido</span>
+                                        {{ form.imagem }}
+                                    </div>
+                                    {% if form.imagem.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.imagem.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">Imagem opcional do produto</div>
+                                </div>
+                                
+                                {% if produto and produto.imagem %}
+                                    <div class="card mb-3">
+                                        <div class="card-body text-center">
+                                            <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" class="img-fluid" style="max-height: 150px;">
+                                            <p class="small text-muted mt-2 mb-0">Imagem atual</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <label for="{{ form.descricao.id_for_label }}" class="form-label">Descrição</label>
+                            {{ form.descricao }}
+                            {% if form.descricao.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.descricao.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.ativo }}
+                                <label class="form-check-label" for="{{ form.ativo.id_for_label }}">Produto Ativo</label>
+                            </div>
+                            {% if form.ativo.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.ativo.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Produtos inativos não são exibidos nas listagens</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'produto_empresa_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">{{ botao }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Funcionalidade do modo escuro
+    const darkModeSwitch = document.getElementById('darkModeSwitch');
+    
+    // Verificar preferência salva
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+        darkModeSwitch.checked = true;
+    }
+    
+    // Alternar modo escuro
+    darkModeSwitch.addEventListener('change', function() {
+        if (this.checked) {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('darkMode', 'disabled');
+        }
+    });
+
+    // Adicionar classe form-control aos campos
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('input[type="text"], input[type="number"], input[type="email"], textarea, select');
+        inputs.forEach(input => {
+            if (!input.classList.contains('form-check-input')) {
+                input.classList.add('form-control');
+            }
+        });
+        
+        // Personalizar o campo de upload de arquivo
+        const fileInput = document.getElementById('{{ form.imagem.id_for_label }}');
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                const fileName = this.value.split('\\').pop();
+                document.getElementById('file-name').textContent = fileName || 'Nenhum arquivo escolhido';
+            });
+            
+            // Ocultar o campo original
+            fileInput.classList.remove('form-control');
+            fileInput.style.fontSize = 0;
+        }
+        
+        // Destaque visual para o campo de estoque
+        const estoqueInput = document.getElementById('{{ form.estoque.id_for_label }}');
+        if (estoqueInput) {
+            estoqueInput.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                this.classList.remove('border-success', 'border-warning', 'border-danger');
+                
+                if (isNaN(value) || value < 0) {
+                    this.classList.add('border-danger');
+                } else if (value <= 5) {
+                    this.classList.add('border-danger');
+                } else if (value <= 10) {
+                    this.classList.add('border-warning');
+                } else {
+                    this.classList.add('border-success');
+                }
+            });
+            
+            // Trigger para aplicar a estilização inicial
+            const event = new Event('input');
+            estoqueInput.dispatchEvent(event);
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %} 

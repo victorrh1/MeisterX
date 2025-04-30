@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gerencial SaaS{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script>
+        // Verificar tema escuro na inicialização da página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar se o tema escuro está ativado
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.body.classList.add('dark-mode');
+            }
+        });
+    </script>
+    <style>
+        /* Variáveis de cor para tema escuro e claro */
+        :root {
+            --light-bg: #f8f9fa;
+            --light-text: #212529;
+            --light-card-bg: #ffffff;
+            --light-border: #dee2e6;
+            
+            --dark-bg: #343a40;
+            --dark-text: #f8f9fa;
+            --dark-card-bg: #212529;
+            --dark-border: #495057;
+            --dark-muted: #d1d1d1;
+            --dark-highlight: #8adbff;
+            --dark-table-header: #2c3136;
+            --dark-table-row-even: #2a2e32;
+            --dark-table-row-odd: #212529;
+        }
+        
+        /* Estilos básicos do tema escuro */
+        .dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+        
+        /* Cards */
+        .dark-mode .card {
+            background-color: var(--dark-card-bg);
+            color: var(--dark-text);
+            border-color: var(--dark-border);
+        }
+        
+        .dark-mode .card-header {
+            background-color: rgba(0, 0, 0, 0.3) !important;
+            border-color: var(--dark-border);
+        }
+        
+        .dark-mode .card-footer {
+            background-color: rgba(0, 0, 0, 0.3) !important;
+            border-color: var(--dark-border);
+        }
+        
+        /* Textos */
+        .dark-mode .text-dark {
+            color: var(--dark-text) !important;
+        }
+        
+        .dark-mode .bg-light,
+        .dark-mode .bg-white {
+            background-color: var(--dark-card-bg) !important;
+        }
+        
+        .dark-mode .text-muted {
+            color: var(--dark-muted) !important;
+        }
+        
+        .dark-mode .text-secondary {
+            color: var(--dark-muted) !important;
+        }
+        
+        /* Bordas */
+        .dark-mode .border {
+            border-color: var(--dark-border) !important;
+        }
+        
+        /* Navbar */
+        .dark-mode .navbar {
+            background-color: var(--dark-card-bg) !important;
+        }
+        
+        .dark-mode .navbar-light .navbar-brand,
+        .dark-mode .navbar-light .navbar-nav .nav-link {
+            color: var(--dark-text) !important;
+        }
+        
+        /* Tabelas - melhorias de contraste */
+        .dark-mode .table {
+            color: var(--dark-text) !important;
+            border-color: var(--dark-border) !important;
+        }
+        
+        .dark-mode .table-light,
+        .dark-mode .table-light th,
+        .dark-mode .table thead,
+        .dark-mode .table thead th,
+        .dark-mode .table th {
+            background-color: var(--dark-table-header) !important;
+            color: #ffffff !important;
+            border-color: var(--dark-border) !important;
+        }
+        
+        .dark-mode .table-hover tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
+        }
+        
+        .dark-mode .table-striped tbody tr:nth-of-type(odd) {
+            background-color: var(--dark-table-row-odd) !important;
+        }
+        
+        .dark-mode .table-striped tbody tr:nth-of-type(even) {
+            background-color: var(--dark-table-row-even) !important;
+        }
+        
+        /* Cores e contrastes para os cards de produtos */
+        .dark-mode .card .card-title,
+        .dark-mode .card h4,
+        .dark-mode .card h5,
+        .dark-mode .card h6,
+        .dark-mode .card .fw-bold {
+            color: #ffffff !important;
+        }
+        
+        .dark-mode .card .pricing .fw-bold,
+        .dark-mode .card .fs-1.fw-bold {
+            color: var(--dark-highlight) !important;
+        }
+        
+        /* Elementos de fundo em cards */
+        .dark-mode .p-2.border.rounded.bg-light,
+        .dark-mode .bg-light {
+            background-color: rgba(0, 0, 0, 0.2) !important;
+            border-color: var(--dark-border) !important;
+        }
+        
+        .dark-mode .p-2.border.rounded.bg-light .small.text-muted {
+            color: #adb5bd !important;
+        }
+        
+        .dark-mode .p-2.border.rounded.bg-light .fw-semibold {
+            color: #ffffff !important;
+        }
+        
+        /* Lista de itens nos cards */
+        .dark-mode .list-group-item {
+            background-color: var(--dark-card-bg);
+            color: var(--dark-text);
+            border-color: var(--dark-border);
+        }
+        
+        /* Breadcrumb */
+        .dark-mode .breadcrumb {
+            background-color: var(--dark-card-bg);
+        }
+        
+        .dark-mode .breadcrumb-item.active {
+            color: #adb5bd;
+        }
+        
+        /* Formulários */
+        .dark-mode .form-control {
+            background-color: #343a40;
+            color: var(--dark-text);
+            border-color: var(--dark-border);
+        }
+        
+        .dark-mode .form-control:focus {
+            background-color: #343a40;
+            color: var(--dark-text);
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        
+        .dark-mode .form-label {
+            color: var(--dark-text);
+        }
+        
+        /* Footer */
+        .dark-mode .footer {
+            background-color: var(--dark-card-bg) !important;
+            color: var(--dark-muted) !important;
+            border-top: 1px solid var(--dark-border);
+        }
+        
+        .dark-mode .footer .text-muted {
+            color: var(--dark-muted) !important;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Gerencial SaaS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                        </li>
+                        {% if user.is_staff %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'perfil_usuario' %}">Meu Perfil</a></li>
+                                <li><a class="dropdown-item" href="{% url 'meus_produtos' %}">
+                                    <i class="fas fa-id-card me-2"></i>Assinaturas
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'notificacoes' %}">
+                                    <i class="fas fa-bell me-2"></i>Notificações
+                                    {% with notificacoes_nao_lidas=user.notificacoes.filter %}
+                                        {% if notificacoes_nao_lidas %}
+                                            <span class="badge bg-danger rounded-pill ms-1">!</span>
+                                        {% endif %}
+                                    {% endwith %}
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Sair</a></li>
+                            </ul>
+                            <!-- Formulário de logout para garantir POST -->
+                            <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+                                {% csrf_token %}
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Entrar</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        {% if messages %}
+            <div class="messagelist">
+                {% for message in messages %}
+                    {% if user.is_cliente and message.tags == 'error' %}
+                        <!-- Não exibe mensagens de erro para clientes -->
+                    {% else %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Toast Container para notificações -->
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+                        <div class="toast-header bg-success text-white">
+                            <i class="fas fa-bell me-2"></i>
+                            <strong class="me-auto">Notificação</strong>
+                            <small>Agora</small>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">© 2025 Gerencial SaaS. Todos os direitos reservados.</span>
+        </div>
+    </footer>
+
+    <!-- Spinner Loader -->
+    {% include 'partials/spinner.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Inicializa os toasts de notificações
+        document.addEventListener('DOMContentLoaded', function() {
+            const toastElements = document.querySelectorAll('.toast');
+            toastElements.forEach(function(toast) {
+                new bootstrap.Toast(toast).show();
+            });
+            
+            // Adicionar spinner ao carregar a página e removê-lo quando estiver pronta
+            if (typeof showSpinner === 'function') {
+                showSpinner();
+                window.addEventListener('load', hideSpinner);
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

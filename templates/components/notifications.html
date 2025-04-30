@@ -1,0 +1,93 @@
+{% load static %}
+
+<div class="relative inline-block text-left" x-data="{ open: false }">
+    <!-- Botão de Notificações -->
+    <button @click="open = !open" type="button" class="relative inline-flex items-center p-2 text-sm font-medium text-gray-700 bg-white rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <span class="sr-only">Ver notificações</span>
+        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+        </svg>
+        {% if notificacoes_nao_lidas %}
+        <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white"></span>
+        {% endif %}
+    </button>
+
+    <!-- Dropdown de Notificações -->
+    <div x-show="open" 
+         @click.away="open = false"
+         x-transition:enter="transition ease-out duration-100"
+         x-transition:enter-start="transform opacity-0 scale-95"
+         x-transition:enter-end="transform opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-75"
+         x-transition:leave-start="transform opacity-100 scale-100"
+         x-transition:leave-end="transform opacity-0 scale-95"
+         class="origin-top-right absolute right-0 mt-2 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none z-50">
+        
+        <div class="p-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Notificações</h3>
+                {% if notificacoes_nao_lidas %}
+                <a href="{% url 'core:marcar_todas_lidas' %}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                    Marcar todas como lidas
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="space-y-4 max-h-96 overflow-y-auto">
+                {% for notificacao in notificacoes %}
+                <div class="flex items-start {% if not notificacao.lida %}bg-blue-50{% endif %} p-3 rounded-lg">
+                    <!-- Ícone baseado no tipo -->
+                    <div class="flex-shrink-0">
+                        {% if notificacao.tipo == 'INFO' %}
+                        <svg class="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {% elif notificacao.tipo == 'ALERTA' %}
+                        <svg class="h-6 w-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        {% elif notificacao.tipo == 'SUCESSO' %}
+                        <svg class="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {% elif notificacao.tipo == 'ERRO' %}
+                        <svg class="h-6 w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {% endif %}
+                    </div>
+
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm font-medium text-gray-900">
+                            {{ notificacao.titulo }}
+                        </p>
+                        <p class="mt-1 text-sm text-gray-500">
+                            {{ notificacao.mensagem }}
+                        </p>
+                        <div class="mt-2 text-xs text-gray-400 flex justify-between items-center">
+                            <span>{{ notificacao.data|date:"d/m/Y H:i" }}</span>
+                            {% if not notificacao.lida %}
+                            <a href="{% url 'core:marcar_lida' notificacao.id %}" class="text-indigo-600 hover:text-indigo-500">
+                                Marcar como lida
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-sm text-gray-500 text-center py-4">
+                    Nenhuma notificação encontrada
+                </p>
+                {% endfor %}
+            </div>
+
+            {% if notificacoes %}
+            <div class="mt-4 text-center">
+                <a href="{% url 'core:todas_notificacoes' %}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                    Ver todas as notificações
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div> 
