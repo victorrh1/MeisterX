@@ -11,6 +11,9 @@ env/
 
 # Arquivos sensíveis
 .env
+dados.json
+db_dump.json
+README.md  # Se quiser ignorar
 
 # Banco de dados local e backups
 db.sqlite3
@@ -37,6 +40,6 @@ media/
 .DS_Store
 Thumbs.db
 
-# Outros arquivos específicos do projeto (se necessário)
+# Outros arquivos específicos do projeto
 dados
 erros
