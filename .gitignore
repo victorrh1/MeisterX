@@ -14,6 +14,7 @@ env/
 dados.json
 db_dump.json
 README.md  # Se quiser ignorar
+test_postgresql.py
 
 # Banco de dados local e backups
 db.sqlite3
