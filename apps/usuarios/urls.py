@@ -20,7 +20,6 @@ urlpatterns = [
     path('contato/', views.contato, name='contato'),
     path('two-factor/verify/', views.two_factor_verify, name='two_factor_verify'),
     path('two-factor/toggle/', views.toggle_two_factor, name='toggle_two_factor'),
-    path('two-factor/toggle/', views.toggle_two_factor, name='two_factor_toggle'),
     path('pos-login/', views.pos_login_redirect, name='pos_login_redirect'),
     
     # URLs de recuperação de senha
